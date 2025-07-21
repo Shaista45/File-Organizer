@@ -20,7 +20,6 @@ file_types = {
     "Presentations": ['.ppt', '.pptx'],
     "Others": []
 }
-
 def get_file_category(extension):
     for category, extensions in file_types.items():
         if extension.lower() in extensions:

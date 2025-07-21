@@ -47,8 +47,8 @@ const categoryColors = {
     'Documents': '#10b981',
     'Music': '#8b5cf6',
     'Videos': '#f59e0b',
-    'Archives': '#eab308',
-    'Others': '#64748b'
+    'Archives': '#1efa17ff',
+    'Others': '#16078bff'
 };
 
 // Initialize Application
@@ -98,7 +98,7 @@ function setTheme(theme) {
     elements.app.setAttribute('data-theme', theme);
     localStorage.setItem('theme', theme);
 
-    // Enhance dark mode styles for a more beautiful look
+    
     if (theme === 'dark') {
         document.body.style.background = 'linear-gradient(135deg, #232526 0%, #414345 100%)';
         document.body.style.color = '#e0e7ef';
