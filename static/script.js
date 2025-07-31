@@ -134,7 +134,7 @@ function handleBrowseFolder() {
 }
 
 // File Organization
-function handleOrganizeFiles() {
+async function handleOrganizeFiles() {
     if (!appState.selectedPath) {
         showToast('Please select a folder first', 'error');
         return;
@@ -158,42 +158,36 @@ async function startOrganization() {
 
     showProgressModal();
 
-    // Simulate organization process
-    await simulateOrganizationProcess();
+    try {
+        const response = await fetch('/organize', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ folderPath: appState.selectedPath })
+        });
 
-    // Get stats based on selected files
-    const stats = getOrganizationStats(appState.selectedFiles || []);
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error || 'Failed to organize files');
+        }
 
-    hideProgressModal();
+        const result = await response.json();
 
-    // Complete organization
-    appState.isOrganizing = false;
-    appState.hasOrganized = true;
-    appState.organizationStats = stats;
+        // Since backend does not return stats, we simulate stats as success message only
+        appState.hasOrganized = true;
+        appState.organizationStats = [];
 
-    updateUI();
-
-    const totalFiles = appState.organizationStats.reduce((sum, stat) => sum + stat.count, 0);
-    showToast(`Successfully organized ${totalFiles} files!`, 'success');
-}
-
-async function simulateOrganizationProcess() {
-    const totalDuration = 3000; // 3 seconds
-    const stepDuration = totalDuration / 100;
-
-    for (let progress = 0; progress <= 100; progress += 2) {
-        // Update progress step
-        const stepIndex = Math.floor((progress / 100) * (progressSteps.length - 1));
-        elements.progressStep.textContent = progressSteps[stepIndex];
-
-        // Update progress bar
-        elements.progressFill.style.width = `${progress}%`;
-        elements.progressText.textContent = `${progress}% Complete`;
-
-        // Wait for next update
-        await new Promise(resolve => setTimeout(resolve, stepDuration));
+        showToast(result.message || 'Files organized successfully.', 'success');
+    } catch (error) {
+        showToast(error.message, 'error');
+    } finally {
+        hideProgressModal();
+        appState.isOrganizing = false;
+        updateUI();
     }
 }
+
 
 // Get organization stats based on selected files
 function getOrganizationStats(files) {
